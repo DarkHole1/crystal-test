@@ -1,0 +1,17 @@
+name: test
+version: 0.1.0
+
+# authors:
+#   - name <email@example.com>
+
+# description: |
+#   Short description of test
+
+dependencies:
+  html5:
+    github: naqvis/crystal-html5
+    branch: master
+  toka:
+    github: Papierkorb/toka
+
+# license: MIT

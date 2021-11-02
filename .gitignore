@@ -1,0 +1,8 @@
+*.html
+*.out
+main
+anytme
+lib
+*.o
+*.csv
+*.txt

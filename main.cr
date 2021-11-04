@@ -14,6 +14,11 @@ class Cli
       type:        String?,
       description: "Path to csv file for output",
     },
+    extended: {
+      type: Bool,
+      default: false,
+      description: "Extended mode generation for mutate mode"
+    }
   }, {
     banner: "Usage: anytme {check | random | mutate} [options] params...\n\nOptions:\n",
     footer: "\nWrite command name with --command-help for additional help",
@@ -84,7 +89,12 @@ when "mutate"
     exit
   end
 
-  Tme::Requester.new(generate_mutations_extended(opts.positional_options[1][1..]).each).each { |e| process_entity e, true, csv }
+  if opts.extended
+    mutations = generate_mutations_extended(opts.positional_options[1][1..])
+  else
+    mutations = generate_mutations(opts.positional_options[1][1..])
+  end
+  Tme::Requester.new(mutations.each).each { |e| process_entity e, true, csv }
 when "recursive"
   puts "Not implemented yet 🥲"
 else

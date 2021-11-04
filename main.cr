@@ -15,7 +15,7 @@ class Cli
       description: "Path to csv file for output",
     },
   }, {
-    banner: "Usage: anytme {check | random} [options] params...\n\nOptions:\n",
+    banner: "Usage: anytme {check | random | mutate} [options] params...\n\nOptions:\n",
     footer: "\nWrite command name with --command-help for additional help",
   })
 end
@@ -72,6 +72,19 @@ when "random"
     puts "Tried #{i}" if i % 100 == 0
     # break if i == 299
   }
+when "mutate"
+  if opts.command_help || opts.positional_options.size < 2
+    puts "Usage: anytme mutate @username"
+    puts <<-STRING
+
+        This command generates usernames from username with mutations known as
+        leetspeak and then checks it.You can use --csv option to save results in
+        csv.
+    STRING
+    exit
+  end
+
+  Tme::Requester.new(generate_mutations_extended(opts.positional_options[1][1..]).each).each { |e| process_entity e, true, csv }
 when "recursive"
   puts "Not implemented yet 🥲"
 else
@@ -149,4 +162,46 @@ def generate_random_username
   else
     res
   end
+end
+
+MUTS = {
+  'a' => '4',
+	'b' => '6',
+	'e' => '3',
+	'f' => '8',
+	'g' => '9',
+	'i' => '1',
+	'l' => '1',
+	'o' => '0',
+	's' => '5',
+	't' => '7',
+	'z' => '2'
+}
+
+def generate_mutations(s : String) : Array(String)
+  return [""] if s.size == 0
+  return generate_mutations(s[1..]).map { |ss| s[0] + ss } unless MUTS.has_key? s[0]
+  res = [] of String
+  generate_mutations(s[1..]).each { |ss|
+    res <<= s[0] + ss
+    res <<= MUTS[s[0]] + ss
+  }
+  res
+end
+
+def generate_mutations_extended(s : String) : Array(String)
+  arr = generate_mutations(s)
+  res = [] of String
+  subres = [] of String
+  arr.each { |s|
+    subres <<= s
+    subres <<= "xxx" + s
+    subres <<= "xxx_" + s
+  }
+  subres.each { |s|
+    res <<= s
+    res <<= s + "xxx"
+    res <<= s + "_xxx"
+  }
+  res
 end

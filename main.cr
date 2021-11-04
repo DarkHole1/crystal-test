@@ -189,14 +189,19 @@ MUTS = {
 }
 
 def generate_mutations(s : String) : Array(String)
-  return [""] if s.size == 0
-  return generate_mutations(s[1..]).map { |ss| s[0] + ss } unless MUTS.has_key? s[0]
-  res = [] of String
-  generate_mutations(s[1..]).each { |ss|
-    res <<= s[0] + ss
-    res <<= MUTS[s[0]] + ss
-  }
-  res
+  case
+  when s == ""
+  	[""]
+  when MUTS.has_key?(s[0])
+  	res = [] of String
+    generate_mutations(s[1..]).each { |ss|
+      res <<= s[0] + ss
+      res <<= MUTS[s[0]] + ss
+    }
+  	res
+	else
+  	generate_muatations(s[1..]).map { |ss| s[0] + ss }
+	end
 end
 
 def generate_mutations_extended(s : String) : Array(String)

@@ -200,7 +200,7 @@ def generate_mutations(s : String) : Array(String)
     }
   	res
 	else
-  	generate_muatations(s[1..]).map { |ss| s[0] + ss }
+  	generate_mutations(s[1..]).map { |ss| s[0] + ss }
 	end
 end
 

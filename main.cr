@@ -188,19 +188,23 @@ MUTS = {
 	'z' => '2'
 }
 
-def generate_mutations(s : String) : Array(String)
+def generate_mutations(s : String)
+  _generate_mutations(s).select /^[^0-9_].{3,}[^_]$/
+end
+
+def _generate_mutations(s : String) : Array(String)
   case
   when s == ""
   	[""]
   when MUTS.has_key?(s[0])
   	res = [] of String
-    generate_mutations(s[1..]).each { |ss|
+    _generate_mutations(s[1..]).each { |ss|
       res <<= s[0] + ss
       res <<= MUTS[s[0]] + ss
     }
   	res
 	else
-  	generate_mutations(s[1..]).map { |ss| s[0] + ss }
+  	_generate_mutations(s[1..]).map { |ss| s[0] + ss }
 	end
 end
 

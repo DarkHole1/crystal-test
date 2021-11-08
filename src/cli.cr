@@ -3,6 +3,7 @@ require "option_parser"
 class Cli
   getter options : CommonOptions
   getter command : Subcommand
+  getter args : Array(String) = [] of String
 
   def initialize
     @options = CommonOptions.new
@@ -40,6 +41,10 @@ class Cli
       parser.on("random", "Checks absolutely random usernames") {
         command = _command = Sub::Random.new
         parser.banner = "Usage: tmetoo random [OPTIONS]"
+      }
+
+      parser.unknown_args { |a, b|
+        @args = a + b
       }
     end
 

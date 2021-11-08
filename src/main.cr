@@ -1,102 +1,44 @@
-require "toka"
+# require "toka"
+require "./cli"
 require "./requester"
 require "random"
 require "csv"
 
-class Cli
-  Toka.mapping({
-    command_help: {
-      type:        Bool,
-      default:     false,
-      description: "Show help for command",
-    },
-    csv: {
-      type:        String?,
-      description: "Path to csv file for output",
-    },
-    extended: {
-      type: Bool,
-      default: false,
-      description: "Extended mode generation for mutate mode"
-    }
-  }, {
-    banner: "Usage: anytme {check | random | mutate} [options] params...\n\nOptions:\n",
-    footer: "\nWrite command name with --command-help for additional help",
-  })
-end
+cli = Cli.new
 
-opts = Cli.new
 csv = nil
-unless opts.csv.nil?
-  csv_file = File.open(opts.csv.not_nil!, "w")
+cli.options.csv.try do |filename|
+  csv_file = File.open(filename, "w")
   csv = CSV::Builder.new(csv_file)
   at_exit {
     csv_file.close()
   }
 end
 
-if opts.positional_options.size < 1
-  puts Toka::HelpPageRenderer.new(Cli, true)
-  exit 1
-end
-case opts.positional_options[0]
-when "check"
-  if opts.command_help
-    puts "Usage: anytme check {@username | filename}..."
-    puts <<-STRING
-
-        This command check entity existence and type. If option starts with @,
-        it is treated as username. In other case, it's treated as file where each
-        line is a username. You can specify multiply options per time.
-    STRING
-    exit
-  end
-  opts.positional_options[1..].each { |option|
+case _command = cli.command
+when Sub::Check
+  cli.args.each { |option|
     if option.starts_with? '@'
       process_entity Tme::Requester.get(option[1..]), true, csv
     else
       Tme::Requester.new(File.read_lines(option).each).each { |e| process_entity e, true, csv }
     end
   }
-when "random"
-  if opts.command_help
-    puts "Usage: anytme random"
-    puts <<-STRING
-
-        This command generates random username and then checks it. It generates
-        more uniform distribution than tmesca. You can use --verbose option for
-        showing unsuccesful attempts. You can use --csv option too.
-    STRING
-    exit
-  end
+when Sub::Random
   i = 0
   loop {
     entity = Tme::Requester.get generate_random_username
     process_entity entity, false
     i += 1
     puts "Tried #{i}" if i % 100 == 0
-    # break if i == 299
   }
-when "mutate"
-  if opts.command_help || opts.positional_options.size < 2
-    puts "Usage: anytme mutate @username"
-    puts <<-STRING
-
-        This command generates usernames from username with mutations known as
-        leetspeak and then checks it.You can use --csv option to save results in
-        csv.
-    STRING
-    exit
-  end
-
-  if opts.extended
-    mutations = generate_mutations_extended(opts.positional_options[1][1..])
+when Sub::Mutate
+  if _command.extended
+    mutations = generate_mutations_extended(cli.args[0][1..])
   else
-    mutations = generate_mutations(opts.positional_options[1][1..])
+    mutations = generate_mutations(cli.args[0][1..])
   end
   Tme::Requester.new(mutations.each).each { |e| process_entity e, true, csv }
-when "recursive"
-  puts "Not implemented yet 🥲"
 else
   puts "Unknown command"
   exit 1

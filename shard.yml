@@ -1,8 +1,8 @@
 name: test
 version: 0.1.0
 
-# authors:
-#   - name <email@example.com>
+authors:
+  - Dark Hole <dark.hole1@yandex.ru>
 
 # description: |
 #   Short description of test
@@ -13,5 +13,9 @@ dependencies:
     branch: master
   toka:
     github: Papierkorb/toka
+
+targets:
+  tmetoo:
+    main: src/main.cr
 
 # license: MIT

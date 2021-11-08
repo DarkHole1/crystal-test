@@ -1,6 +1,7 @@
 # require "toka"
 require "./cli"
 require "./requester"
+require "./entity"
 require "random"
 require "csv"
 
@@ -17,6 +18,7 @@ end
 
 case _command = cli.command
 when Sub::Check
+  p! Tme::Entity.from_strings(cli.args)
   cli.args.each { |option|
     if option.starts_with? '@'
       process_entity Tme::Requester.get(option[1..]), true, csv

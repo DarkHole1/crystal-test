@@ -1,9 +1,9 @@
 require "http/client"
 require "benchmark"
 
-def fmap(arr : Array(String), &block : String -> String)
-  res = Array(String).new arr.size, ""
-  chan = Channel(String).new
+def fmap(arr : Array(T), &block : T -> T) forall T
+  res = Array(T).new arr.size, ""
+  chan = Channel(T).new
   arr.each { |e|
     spawn {
       chan.send(block.call(e))

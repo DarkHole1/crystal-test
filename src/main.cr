@@ -15,8 +15,9 @@ end
 
 case _command = cli.command
 when Sub::Check
-  Tme::Entity.from_strings(cli.args).each { |entity|
-    process_entity entity.resolve, csv
+  Tme::Entity.from_strings(cli.args).resolve { |entity|
+    # process_entity entity.resolve, csv
+    process_entity entity, csv
   }
 when Sub::Random
   i = 0

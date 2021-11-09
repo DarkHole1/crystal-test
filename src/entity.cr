@@ -1,4 +1,5 @@
 require "./requester"
+require "csv"
 
 module Tme
   module Entity
@@ -29,6 +30,12 @@ module Tme
         id: @id,
         link: link,
         type: @type
+      }
+    end
+
+    def to_csv(io : IO)
+      CSV.build(io) { |csv|
+        csv.row(@id, @type)
       }
     end
   end

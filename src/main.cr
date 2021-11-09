@@ -3,6 +3,7 @@ require "./cli"
 require "./requester"
 require "./entity"
 require "random"
+require "colorize"
 require "csv"
 
 cli = Cli.new
@@ -18,13 +19,8 @@ end
 
 case _command = cli.command
 when Sub::Check
-  p! Tme::Entity.from_strings(cli.args)
-  cli.args.each { |option|
-    if option.starts_with? '@'
-      process_entity Tme::Requester.get(option[1..]), true, csv
-    else
-      Tme::Requester.new(File.read_lines(option).each).each { |e| process_entity e, true, csv }
-    end
+  Tme::Entity.from_strings(cli.args).each { |entity|
+    process_entity entity.resolve
   }
 when Sub::Random
   i = 0
@@ -153,7 +149,7 @@ def _generate_mutations(s : String) : Array(String)
 end
 
 def generate_mutations_extended(s : String) : Array(String)
-  arr = generate_mutations(s)
+  arr = _generate_mutations(s)
   res = [] of String
   subres = [] of String
   arr.each { |s|

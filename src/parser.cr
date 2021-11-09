@@ -1,51 +1,7 @@
-require "colorize"
+require "./entity"
 require "html5"
 
 module Tme
-  module Entity
-    getter id : String
-
-    def link
-      "https://t.me/#{@id}"
-    end
-  end
-
-  class Unknown
-    include Entity
-
-    def initialize(@id : String)
-    end
-  end
-
-  class User
-    include Entity
-    getter title : String
-    getter description : String
-
-    def initialize(@id : String, @title : String, @description : String)
-    end
-  end
-
-  class Channel
-  include Entity
-    getter title : String
-    getter description : String
-    getter members : String
-
-    def initialize(@id : String, @title : String, @description : String, @members : String | Nil)
-    end
-  end
-
-  class Group
-  include Entity
-    getter title : String
-    getter description : String
-    getter members : String
-
-    def initialize(@id : String, @title : String, @description : String, @members : String)
-    end
-  end
-
   class Parser
     def self.parse(data : String, id : String) : Entity | Nil
       html = HTML5.parse data
@@ -81,11 +37,11 @@ module Tme
 
       case entity_type
       when :user
-        User.new(id, title.inner_text, desc)
+        User.new(id, title.inner_text.strip, desc)
       when :group
-        Group.new(id, title.inner_text, desc, parse_members members_str)
+        Group.new(id, title.inner_text.strip, desc, parse_members members_str)
       when :channel
-        Channel.new(id, title.inner_text, desc, parse_members members_str)
+        Channel.new(id, title.inner_text.strip, desc, parse_members members_str)
       else
         Unknown.new(id)
       end

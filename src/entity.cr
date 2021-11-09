@@ -1,5 +1,4 @@
-require "colorize"
-require "html5"
+require "./requester"
 
 module Tme
   module Entity
@@ -29,6 +28,10 @@ module Tme
     include Entity
 
     def initialize(@id : String)
+    end
+
+    def resolve() : Entity
+      Requester.get(@id)
     end
   end
 

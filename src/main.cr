@@ -10,10 +10,7 @@ cli = Cli.new
 
 csv = nil
 cli.options.csv.try do |filename|
-  _csv = csv = File.open(filename, "w")
-  at_exit {
-    _csv.close()
-  }
+  csv = File.open(filename, "w")
 end
 
 case _command = cli.command

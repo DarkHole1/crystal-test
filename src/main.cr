@@ -10,23 +10,22 @@ cli = Cli.new
 
 csv = nil
 cli.options.csv.try do |filename|
-  csv_file = File.open(filename, "w")
-  csv = CSV::Builder.new(csv_file)
+  _csv = csv = File.open(filename, "w")
   at_exit {
-    csv_file.close()
+    _csv.close()
   }
 end
 
 case _command = cli.command
 when Sub::Check
   Tme::Entity.from_strings(cli.args).each { |entity|
-    process_entity entity.resolve
+    process_entity entity.resolve, csv
   }
 when Sub::Random
   i = 0
   loop {
     entity = Tme::Requester.get generate_random_username
-    process_entity entity, false
+    process_entity entity, csv
     i += 1
     puts "Tried #{i}" if i % 100 == 0
   }
@@ -36,25 +35,22 @@ when Sub::Mutate
   else
     mutations = generate_mutations(cli.args[0][1..])
   end
-  Tme::Requester.new(mutations.each).each { |e| process_entity e, true, csv }
+  Tme::Requester.new(mutations.each).each do |entity|
+    process_entity entity, csv
+  end
 else
   puts "Unknown command"
   exit 1
 end
 
-def process_entity(entity, unknown = true, csv = nil)
+def process_entity(entity : Tme::Entity, csv : IO | Nil = nil)\
   case entity
-  when Tme::Channel, Tme::Group, Tme::User
-    puts entity.format("✓ @%{id} %{type}").colorize.green
-    csv.row("@#{entity.id}", entity.type) unless csv.nil?
   when Tme::Unknown
-    if unknown
-      puts "✗ @#{entity.id} not found".colorize.red
-      csv.row("@#{entity.id}", "not found") unless csv.nil?
-    end
+    puts entity.format("✗ @%{id} %{type}").colorize.red
   else
-    puts "✗ [some error occured]".colorize.red
+    puts entity.format("✓ @%{id} %{type}").colorize.green
   end
+  entity.to_csv csv
 end
 
 ALPHABET_FIRST = ('a'..'z').to_a

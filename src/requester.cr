@@ -3,7 +3,7 @@ require "./parser"
 
 module Tme
   class Requester
-    include Iterator(Entity | Nil)
+    include Iterator(Entity)
     @@count = 0
     @@start_time = Time.monotonic
 

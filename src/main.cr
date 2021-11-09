@@ -44,15 +44,9 @@ end
 
 def process_entity(entity, unknown = true, csv = nil)
   case entity
-  when Tme::Channel
-    puts "✓ @#{entity.id} channel".colorize.green
-    csv.row("@#{entity.id}", "channel") unless csv.nil?
-  when Tme::Group
-    puts "✓ @#{entity.id} group".colorize.green
-    csv.row("@#{entity.id}", "group") unless csv.nil?
-  when Tme::User
-    puts "✓ @#{entity.id} user".colorize.green
-    csv.row("@#{entity.id}", "user") unless csv.nil?
+  when Tme::Channel, Tme::Group, Tme::User
+    puts entity.format("✓ @%{id} %{type}").colorize.green
+    csv.row("@#{entity.id}", entity.type) unless csv.nil?
   when Tme::Unknown
     if unknown
       puts "✗ @#{entity.id} not found".colorize.red

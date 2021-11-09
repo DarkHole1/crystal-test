@@ -3,6 +3,7 @@ require "./requester"
 module Tme
   module Entity
     getter id : String
+    getter type : String
 
     def link
       "https://t.me/#{@id}"
@@ -22,12 +23,21 @@ module Tme
     def self.from_strings(ss : Array(String)) : Array(NotChecked)
       ss.map { |s| Entity.from_string s }.flatten
     end
+
+    def format(s : String) : String
+      s % {
+        id: @id,
+        link: link,
+        type: @type
+      }
+    end
   end
 
   class NotChecked
     include Entity
 
     def initialize(@id : String)
+      @type = "not checked"
     end
 
     def resolve() : Entity
@@ -39,6 +49,7 @@ module Tme
     include Entity
 
     def initialize(@id : String)
+      @type = "unknown"
     end
   end
 
@@ -48,6 +59,7 @@ module Tme
     getter description : String
 
     def initialize(@id : String, @title : String, @description : String)
+      @type = "user"
     end
   end
 
@@ -58,6 +70,7 @@ module Tme
     getter members : String
 
     def initialize(@id : String, @title : String, @description : String, @members : String | Nil)
+      @type = "channel"
     end
   end
 
@@ -68,6 +81,7 @@ module Tme
     getter members : String
 
     def initialize(@id : String, @title : String, @description : String, @members : String)
+      @type = "group"
     end
   end
 end

@@ -27,10 +27,13 @@ module Tme
 
     def format(s : String) : String
       s % {
-        id: @id,
+        id:   @id,
         link: link,
-        type: @type
+        type: @type,
       }
+    end
+
+    def to_csv(io : Nil) : Nil
     end
 
     def to_csv(io : IO)
@@ -47,7 +50,7 @@ module Tme
       @type = "not checked"
     end
 
-    def resolve() : Entity
+    def resolve : Entity
       Requester.get(@id)
     end
   end

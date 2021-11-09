@@ -32,15 +32,18 @@ module Tme
     end
 
     def self.by_chunks(arr : Array(NotChecked), size = 300, &block : Entity ->)
-      arr.each_slice(size).map do |chunk|
+      # pp! arr, size, block, arr.each_slice(size).to_a
+      arr.cycle.each_slice(size).map do |chunk|
+        # p! chunk
         start = Time.monotonic
         fmap(chunk) do |entity|
+          # p! entity
           response = HTTP::Client.get "https://t.me/#{entity.id}"
           Parser.parse response.body, entity.id
         end.each &block
         diff = Time.monotonic - start
         sleep(1.minute - diff) if diff < 1.minute
-      end
+      end.size
     end
 
     private def self.fmap(arr : Array(T), &block : T -> U) forall T, U
